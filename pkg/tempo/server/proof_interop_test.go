@@ -96,10 +96,11 @@ func TestVerifyProof_RejectsCrossAccountAccessKeyReplay(t *testing.T) {
 	}
 }
 
-// TestRecoverProofSigner_AcceptsMppxSignatureVector pins a known proof
-// signature (v=27/28) and checks it recovers to the bound wallet, exercising
-// the digest and the y-parity normalization in recoverProofSigner.
-func TestRecoverProofSigner_AcceptsMppxSignatureVector(t *testing.T) {
+// TestRecoverProofSigner_AcceptsLegacyVSignatureVector pins a known proof
+// signature with a legacy v=27/28 recovery byte and checks it recovers to the
+// bound wallet, exercising the digest and the y-parity normalization in
+// recoverProofSigner.
+func TestRecoverProofSigner_AcceptsLegacyVSignatureVector(t *testing.T) {
 	t.Parallel()
 
 	account := common.HexToAddress("0x1a642f0E3c3aF545E7AcBD38b07251B3990914F1")
@@ -107,17 +108,17 @@ func TestRecoverProofSigner_AcceptsMppxSignatureVector(t *testing.T) {
 		chainID     = int64(42431)
 		challengeID = "kM9xPqWvT2nJrHsY4aDfEb"
 		realm       = "api.example.com"
-		// Conformance vector: proof signature with a legacy v=27/28 byte.
-		mppxSignature = "0x53f5d64d9f995e841b4212639b2e17e508e96752e10316df3814a16443dcbdb626c082190a4c3ecc3148101eb443d15bd83b579380b1be735a9c99f0df36c9fe1b"
+		// Proof signature with a legacy v=27/28 recovery byte.
+		legacyVSignature = "0x53f5d64d9f995e841b4212639b2e17e508e96752e10316df3814a16443dcbdb626c082190a4c3ecc3148101eb443d15bd83b579380b1be735a9c99f0df36c9fe1b"
 	)
 
 	proofHash, err := tempo.ProofTypedDataHash(chainID, account, challengeID, realm)
 	assert.NoError(t, err)
 
-	signer, err := recoverProofSigner(proofHash, mppxSignature, account)
+	signer, err := recoverProofSigner(proofHash, legacyVSignature, account)
 	assert.NoError(t, err)
 	assert.Equalf(t, account.Hex(), signer.Hex(),
-		"mppx proof signature must recover to the bound wallet")
+		"legacy-v proof signature must recover to the bound wallet")
 }
 
 // TestRecoverProofSigner_KeychainAcceptsLegacyVRecoveryByte checks that a

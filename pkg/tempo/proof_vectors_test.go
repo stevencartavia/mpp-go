@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestProofTypedDataHashCrossSDKVector pins the proof digest to a fixed vector
-// so the wire format cannot drift.
-func TestProofTypedDataHashCrossSDKVector(t *testing.T) {
+// TestProofTypedDataHashPinnedVector pins the proof digest to a fixed value so
+// the wire format cannot drift.
+func TestProofTypedDataHashPinnedVector(t *testing.T) {
 	t.Parallel()
 
 	const (
@@ -17,14 +17,14 @@ func TestProofTypedDataHashCrossSDKVector(t *testing.T) {
 		challengeID = "kM9xPqWvT2nJrHsY4aDfEb"
 		realm       = "api.example.com"
 		// account is derived from private key 0x01*32; wantDigest is the
-		// corresponding pinned proof digest.
+		// proof digest this Go implementation produces for those inputs.
 		account    = "0x1a642f0E3c3aF545E7AcBD38b07251B3990914F1"
 		wantDigest = "0x3860a700a55e02ad3c2dc047e92489feceecbdb0a801d948e1d9f0b61ea9bc3f"
 	)
 
 	got, err := ProofTypedDataHash(chainID, common.HexToAddress(account), challengeID, realm)
 	assert.NoError(t, err)
-	assert.Equalf(t, wantDigest, got.Hex(), "proof digest must match the pinned vector")
+	assert.Equalf(t, wantDigest, got.Hex(), "proof digest must match the pinned Go wire-format value")
 }
 
 // TestProofTypedDataHashWalletBinding checks that the digest is bound to the

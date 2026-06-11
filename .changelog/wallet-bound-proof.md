@@ -2,6 +2,6 @@
 github.com/tempoxyz/mpp-go: patch
 ---
 
-Breaking Tempo proof credential wire format: zero-amount proofs are now wallet-bound. The canonical EIP-712 `Proof` message is now `account address` first, followed by `challengeId` and `realm`, and the MPP domain version is `"3"`, matching the mppx (TypeScript) SDK. Verifiers rebuild the digest from the credential `source` payer address, so proofs produced with the previous message shape/domain version are rejected; Go and TypeScript clients/servers must use the v3 proof format together. This closes cross-account replay for access keys authorized on multiple accounts.
+Wallet-bind Tempo zero-amount proofs to close cross-account replay. The EIP-712 `Proof` message now leads with the payer `account` address (then `challengeId`, `realm`) and the MPP domain version is `"3"`. Verifiers rebuild the digest from the credential `source`, so client and server must both use v3. `ProofTypedDataHash` now takes an `account common.Address`; `ProofTypedData` exposes the typed data.
 
-Breaking Go API: `ProofTypedDataHash` now requires an `account common.Address` parameter. `ProofTypedData` exposes the canonical wallet-bound typed data. Added cross-SDK digest/signature conformance coverage.
+Note: v3 is not yet interoperable with the mppx (TypeScript) SDK, which still uses v2 (`Proof = [challengeId, realm]`, no `account`).
